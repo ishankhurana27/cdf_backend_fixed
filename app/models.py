@@ -1,4 +1,4 @@
-from uuid import uuid1
+import uuid
 from sqlalchemy import UUID, Column, DateTime, Integer, String, Float, ForeignKey, func
 from sqlalchemy.dialects.postgresql import JSONB
 from geoalchemy2 import Geometry
@@ -52,3 +52,35 @@ class UploadMetadata(Base):
 
     source = relationship("Source")
     sub_source = relationship("SubSource")
+
+
+class MmsiWarehouse(Base):
+    __tablename__ = "mmsi_warehouse"
+
+    id = Column(Integer, primary_key=True, index=True)
+    nav_status = Column(String)
+    rot = Column(Float)
+    sog = Column(Float)
+    latitude = Column(Float)
+    longitude = Column(Float)
+    cog = Column(Float)
+    true_heading = Column(Integer)
+    imo = Column(Integer)
+    ship_name = Column(String)
+    call_sign = Column(String)
+    ship_type = Column(String)
+    draught = Column(Float)
+    destination = Column(String)
+    dimbow = Column(Integer)
+    dimstern = Column(Integer)
+    dimport = Column(Integer)
+    dimstarboard = Column(Integer)
+    eta = Column(DateTime)  # <-- FIXED
+    beam = Column(Integer)
+    length = Column(Integer)
+    rec_time = Column(DateTime)  # <-- FIXED
+    source = Column(String)
+    country = Column(String)
+    flag_name = Column(String)
+    file_uuid = Column(UUID(as_uuid=True), nullable=False, index=True)
+    uuid = Column(UUID(as_uuid=True), default=uuid.uuid4, nullable=False, index=True)

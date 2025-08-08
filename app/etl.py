@@ -283,3 +283,67 @@ def dms_to_decimal(coord_str: str) -> float:
         raise ValueError(f"Invalid coordinate format: {coord_str}")
 
 
+def convert_to_mmsi(row: dict, upload_uuid: str, file_uuid: str) -> dict:
+    def parse_float(val):
+        try:
+            if pd.isna(val) or val == "" or val is None:
+                return None
+            return float(val)
+        except Exception:
+            return None
+
+    def parse_int(val):
+        try:
+            if pd.isna(val) or val == "" or val is None:
+                return None
+            return int(float(val))  # Handles cases where int is given as float string
+        except Exception:
+            return None
+
+    def parse_str(val):
+        if pd.isna(val) or val is None:
+            return ""
+        return str(val)
+
+    def parse_dt(val):
+        try:
+            if pd.isna(val) or val == "" or val is None:
+                return None
+            # Try both with and without seconds fraction
+            try:
+                return datetime.strptime(str(val), "%Y-%m-%d %H:%M:%S")
+            except ValueError:
+                return datetime.strptime(str(val), "%Y-%m-%d %H:%M:%S.%f")
+        except Exception:
+            return None
+
+    return {
+        "nav_status": parse_str(row.get("nav_status")),
+        "rot": parse_float(row.get("rot")),
+        "sog": parse_float(row.get("sog")),
+        "latitude": parse_float(row.get("latitude")),
+        "longitude": parse_float(row.get("longitude")),
+        "cog": parse_float(row.get("cog")),
+        "true_heading": parse_int(row.get("true_heading")),
+        "imo": parse_int(row.get("imo")),
+        "ship_name": parse_str(row.get("ship_name")),
+        "call_sign": parse_str(row.get("call_sign")),
+        "ship_type": parse_str(row.get("ship_type")),
+        "draught": parse_float(row.get("draught")),
+        "destination": parse_str(row.get("destination")),
+        "dimbow": parse_int(row.get("dimbow")),
+        "dimstern": parse_int(row.get("dimstern")),
+        "dimport": parse_int(row.get("dimport")),
+        "dimstarboard": parse_int(row.get("dimstarboard")),
+        "eta": parse_dt(row.get("eta")),
+        "beam": parse_int(row.get("beam")),
+        "length": parse_int(row.get("length")),
+        "rec_time": parse_dt(row.get("rec_time")),
+        "source": parse_str(row.get("source")),
+        "country": parse_str(row.get("country")),
+        "flag_name": parse_str(row.get("flag_name")),
+        "file_uuid": file_uuid,
+        "uuid": upload_uuid
+    }
+
+

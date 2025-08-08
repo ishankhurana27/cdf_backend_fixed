@@ -5,8 +5,8 @@ from sqlalchemy.orm import Session
 import json
 import logging
 from app.database import SessionLocal
-from app.models import MaritimeDataCDF, Source, SubSource, UploadMetadata
-from app.etl import convert_to_ais, convert_to_cdf, convert_to_cdf_from_csv_row, convert_to_piracy, parse_structured_file,convert_to_p8i
+from app.models import MaritimeDataCDF, Source, SubSource, UploadMetadata, MmsiWarehouse
+from app.etl import convert_to_ais, convert_to_cdf, convert_to_cdf_from_csv_row, convert_to_piracy, parse_structured_file,convert_to_p8i, convert_to_mmsi
 from geoalchemy2.shape import to_shape
 import pandas as pd
 from fastapi.responses import StreamingResponse
@@ -329,29 +329,45 @@ async def upload_structured(
         inserted = 0
         failed_rows = []
 
+       
         for i, row in df.iterrows():
             record_uuid = str(uuid.uuid4())  # Per-record UUID
             try:
                 if upload_source.lower() == "piracy":
                     cdf_data = convert_to_piracy(row, record_uuid)
+                    db_data = MaritimeDataCDF(
+                        **cdf_data,
+                        source_id=source.id if source else 1,
+                        sub_source_id=sub_source.id if sub_source else 1
+                    )
                 elif upload_source.lower() == "ais":
                     cdf_data = convert_to_ais(row, record_uuid)
+                    db_data = MaritimeDataCDF(
+                        **cdf_data,
+                        source_id=source.id if source else 1,
+                        sub_source_id=sub_source.id if sub_source else 1
+                    )
                 elif upload_source.lower() == "dmas":
                     cdf_data = convert_to_cdf(row, record_uuid)
+                    db_data = MaritimeDataCDF(
+                        **cdf_data,
+                        source_id=source.id if source else 1,
+                        sub_source_id=sub_source.id if sub_source else 1
+                    )
                 elif upload_source.lower() == "p8i":
-                    cdf_data = convert_to_p8i(row, record_uuid)
-
+                    cdf_data = convert_to_cdf_from_csv_row(row, record_uuid)
+                    db_data = MaritimeDataCDF(
+                        **cdf_data,
+                        source_id=source.id if source else 1,
+                        sub_source_id=sub_source.id if sub_source else 1
+                    )
+                elif upload_source.lower() == "mmsi":
+                    cdf_data = convert_to_mmsi(row, record_uuid, file_uuid)
+                    db_data = MmsiWarehouse(**cdf_data)
                 else:
                     failed_rows.append(f"Row {i} skipped: unknown source type")
                     continue
 
-                db_data = MaritimeDataCDF(
-                    **cdf_data,
-                    # uuid=record_uuid,
-                    # file_uuid=file_uuid,
-                    source_id=source.id if source else 1,
-                    sub_source_id=sub_source.id if sub_source else 1
-                )
                 db.add(db_data)
                 inserted += 1
             except Exception as e:
