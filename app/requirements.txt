@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+sqlalchemy
+psycopg2-binary
+pydantic
+geoalchemy2
+pandas
+openpyxl
+pyspark>=3.5.0
+pypdf
+python-docx
+openpyxl
+python-multipart
+pymongo

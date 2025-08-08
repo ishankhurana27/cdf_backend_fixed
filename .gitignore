@@ -1,0 +1,58 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+env/
+venv
+ENV/
+venvv/
+
+# VS Code settings
+.vscode/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# PyCharm
+.idea/
+
+# macOS files
+.DS_Store
+
+# Logs and output files
+*.log
+*.out
+
+# System-generated
+Thumbs.db
+
+# Spark output and temp files
+*.crc
+refined_output.csv
+
+# Secrets and configs (if added)
+config.py
+
+# Python cache
+*.pyo
+*.pyd
+
+# Temporary data files
+*.tmp
+*.bak
+
+# Test database or local dumps
+*.sqlite3
+*.db
+
+# Uploaded or processed files
+*.xlsx
+*.csv
+*.tsv
+*.ndjson
+
+# Ignore Excel and CSV generated during runtime
+cdf_export.xlsx
+pirate_attacks.csv
